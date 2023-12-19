@@ -4,7 +4,6 @@ package org.example.spring_mysql_demo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.tags.Param;
 
 @Controller
 @RequestMapping(path = "/demo")
@@ -27,9 +26,13 @@ public class MainController {
 
     @PutMapping(path = "/update/{id}")
     public @ResponseBody String updateUser(@PathVariable Integer id, @RequestParam String name, @RequestParam String email) {
-        User user = new User(name, email);
+        var optionalUser = userRepository.findById(id);
+        if (optionalUser.isEmpty()) return "User not found with ID:" + id;
+        var user = optionalUser.get();
+        user.setName(name);
+        user.setEmail(email);
         userRepository.save(user);
-        return "Updated";
+        return "Updated User ID: " + id;
     }
 
     @DeleteMapping(path = "/delete")
